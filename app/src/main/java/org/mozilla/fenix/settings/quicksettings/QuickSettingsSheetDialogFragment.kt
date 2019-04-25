@@ -62,7 +62,7 @@ class QuickSettingsSheetDialogFragment : BottomSheetDialogFragment(), CoroutineS
     override fun onViewCreated(rootView: View, savedInstanceState: Bundle?) {
         super.onViewCreated(rootView, savedInstanceState)
         quickSettingsComponent = QuickSettingsComponent(
-            rootView as ConstraintLayout, ActionBusFactory.get(this),
+            rootView as ConstraintLayout, this, ActionBusFactory.get(this),
             QuickSettingsState(
                 QuickSettingsState.Mode.Normal(url, isSecured, isTrackingProtectionOn, sitePermissions)
             )

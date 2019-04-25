@@ -6,28 +6,33 @@ package org.mozilla.fenix.home.sessioncontrol
 
 import android.graphics.Bitmap
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Observer
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
 import org.mozilla.fenix.mvi.Change
+import org.mozilla.fenix.mvi.Reducer
 import org.mozilla.fenix.mvi.UIComponent
 import org.mozilla.fenix.mvi.ViewState
 
 class SessionControlComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
-    override var initialState: SessionControlState = SessionControlState(emptyList(), Mode.Normal)
+    override var initialState: SessionControlState = SessionControlState()
 ) :
     UIComponent<SessionControlState, SessionControlAction, SessionControlChange>(
+        fragment,
         bus.getManagedEmitter(SessionControlAction::class.java),
         bus.getSafeManagedObservable(SessionControlChange::class.java)
     ) {
 
-    override val reducer: (SessionControlState, SessionControlChange) -> SessionControlState = { state, change ->
+    override val reducer: Reducer<VM<SessionControlState>, SessionControlChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
-            is SessionControlChange.TabsChange -> state.copy(tabs = change.tabs)
-            is SessionControlChange.ModeChange -> state.copy(mode = change.mode)
+            is SessionControlChange.TabsChange -> vm.copyIn(state.copy(tabs = change.tabs))
+            is SessionControlChange.ModeChange -> vm.copyIn(state.copy(mode = change.mode))
         }
     }
 
@@ -36,7 +41,7 @@ class SessionControlComponent(
         get() = uiView.view as RecyclerView
 
     init {
-        render(reducer)
+        render(reducer, VM<SessionControlState>()::class)
     }
 }
 
@@ -55,9 +60,9 @@ sealed class Mode {
 }
 
 data class SessionControlState(
-    val tabs: List<Tab>,
-    val mode: Mode
-) : ViewState
+    val tabs: List<Tab> = emptyList(),
+    val mode: Mode = Mode.Normal
+) : ViewState()
 
 sealed class TabAction : Action {
     object SaveTabGroup : TabAction()

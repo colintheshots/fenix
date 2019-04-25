@@ -5,6 +5,7 @@
 package org.mozilla.fenix.library.bookmarks
 
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
 import org.mozilla.fenix.mvi.Change
@@ -15,18 +16,20 @@ import org.mozilla.fenix.mvi.ViewState
 
 class SignInComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
-    override var initialState: SignInState =
-        SignInState(false)
+    override var initialState: SignInState = SignInState()
 ) : UIComponent<SignInState, SignInAction, SignInChange>(
+    fragment,
     bus.getManagedEmitter(SignInAction::class.java),
     bus.getSafeManagedObservable(SignInChange::class.java)
 ) {
 
-    override val reducer: Reducer<SignInState, SignInChange> = { state, change ->
+    override val reducer: Reducer<VM<SignInState>, SignInChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
-            SignInChange.SignedIn -> state.copy(signedIn = true)
-            SignInChange.SignedOut -> state.copy(signedIn = false)
+            SignInChange.SignedIn -> vm.copyIn(state.copy(signedIn = true))
+            SignInChange.SignedOut -> vm.copyIn(state.copy(signedIn = false))
         }
     }
 
@@ -34,11 +37,11 @@ class SignInComponent(
         SignInUIView(container, actionEmitter, changesObservable)
 
     init {
-        render(reducer)
+        render(reducer, VM<SignInState>()::class)
     }
 }
 
-data class SignInState(val signedIn: Boolean) : ViewState
+data class SignInState(val signedIn: Boolean = false) : ViewState()
 
 sealed class SignInAction : Action {
     object ClickedSignIn : SignInAction()

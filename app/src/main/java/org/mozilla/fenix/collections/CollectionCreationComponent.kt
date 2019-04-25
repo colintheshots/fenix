@@ -5,6 +5,7 @@ package org.mozilla.fenix.collections
    file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
 import org.mozilla.fenix.mvi.Change
@@ -19,7 +20,7 @@ data class Tab(
     val title: String
 )
 
-data class CollectionCreationState(val tabs: List<Tab> = listOf(), val selectedTabs: Set<Tab> = setOf()) : ViewState
+data class CollectionCreationState(val tabs: List<Tab> = listOf(), val selectedTabs: Set<Tab> = setOf()) : ViewState()
 
 sealed class CollectionCreationChange : Change {
     data class TabListChange(val tabs: List<Tab>) : CollectionCreationChange()
@@ -38,23 +39,26 @@ sealed class CollectionCreationAction : Action {
 
 class CollectionCreationComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
     override var initialState: CollectionCreationState = CollectionCreationState()
 ) : UIComponent<CollectionCreationState, CollectionCreationAction, CollectionCreationChange>(
+    fragment,
     bus.getManagedEmitter(CollectionCreationAction::class.java),
     bus.getSafeManagedObservable(CollectionCreationChange::class.java)
 ) {
-    override val reducer: Reducer<CollectionCreationState, CollectionCreationChange> = { state, change ->
+    override val reducer: Reducer<VM<CollectionCreationState>, CollectionCreationChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
-            is CollectionCreationChange.AddAllTabs -> state.copy(selectedTabs = state.tabs.toSet())
-            is CollectionCreationChange.TabListChange -> state.copy(tabs = change.tabs)
+            is CollectionCreationChange.AddAllTabs -> vm.copyIn(state.copy(selectedTabs = state.tabs.toSet()))
+            is CollectionCreationChange.TabListChange -> vm.copyIn(state.copy(tabs = change.tabs))
             is CollectionCreationChange.TabAdded -> {
                 val selectedTabs = state.selectedTabs + setOf(change.tab)
-                state.copy(selectedTabs = selectedTabs)
+                vm.copyIn(state.copy(selectedTabs = selectedTabs))
             }
             is CollectionCreationChange.TabRemoved -> {
                 val selectedTabs = state.selectedTabs - setOf(change.tab)
-                state.copy(selectedTabs = selectedTabs)
+                vm.copyIn(state.copy(selectedTabs = selectedTabs))
             }
         }
     }
@@ -62,6 +66,6 @@ class CollectionCreationComponent(
     override fun initView() = CollectionCreationUIView(container, actionEmitter, changesObservable)
 
     init {
-        render(reducer)
+        render(reducer, VM<CollectionCreationState>()::class)
     }
 }

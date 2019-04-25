@@ -7,6 +7,7 @@ package org.mozilla.fenix.components.toolbar
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.component_search.*
 import mozilla.components.browser.search.SearchEngine
 import mozilla.components.browser.toolbar.BrowserToolbar
@@ -21,25 +22,29 @@ import org.mozilla.fenix.mvi.ViewState
 
 class ToolbarComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
     private val sessionId: String?,
     private val isPrivate: Boolean,
-    override var initialState: SearchState = SearchState("", "", false),
-    private val engineIconView: ImageView? = null
-) :
+    private val engineIconView: ImageView? = null,
+    override var initialState: SearchState = SearchState("", "", false)
+
+    ) :
     UIComponent<SearchState, SearchAction, SearchChange>(
+        fragment,
         bus.getManagedEmitter(SearchAction::class.java),
         bus.getSafeManagedObservable(SearchChange::class.java)
     ) {
 
     fun getView(): BrowserToolbar = uiView.toolbar
 
-    override val reducer: Reducer<SearchState, SearchChange> = { state, change ->
+    override val reducer: Reducer<VM<SearchState>, SearchChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
-            is SearchChange.ToolbarClearedFocus -> state.copy(focused = false)
-            is SearchChange.ToolbarRequestedFocus -> state.copy(focused = true)
+            is SearchChange.ToolbarClearedFocus -> vm.copyIn(state.copy(focused = false))
+            is SearchChange.ToolbarRequestedFocus -> vm.copyIn(state.copy(focused = true))
             is SearchChange.SearchShortcutEngineSelected ->
-                state.copy(engine = change.engine)
+                vm.copyIn(state.copy(engine = change.engine))
         }
     }
 
@@ -53,7 +58,7 @@ class ToolbarComponent(
     )
 
     init {
-        render(reducer)
+        render(reducer, VM<SearchState>()::class)
         applyTheme()
     }
 
@@ -74,9 +79,9 @@ class ToolbarComponent(
 }
 
 data class SearchState(
-    val query: String,
-    val searchTerm: String,
-    val isEditing: Boolean,
+    val query: String = "",
+    val searchTerm: String = "",
+    val isEditing: Boolean = false,
     val engine: SearchEngine? = null,
     val focused: Boolean = isEditing
 ) : ViewState

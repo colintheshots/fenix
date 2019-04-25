@@ -4,6 +4,7 @@ package org.mozilla.fenix.search.awesomebar
    file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import mozilla.components.browser.search.SearchEngine
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
@@ -13,10 +14,10 @@ import org.mozilla.fenix.mvi.UIComponent
 import org.mozilla.fenix.mvi.ViewState
 
 data class AwesomeBarState(
-    val query: String,
-    val showShortcutEnginePicker: Boolean,
+    val query: String = "",
+    val showShortcutEnginePicker: Boolean = false,
     val suggestionEngine: SearchEngine? = null
-) : ViewState
+) : ViewState()
 
 sealed class AwesomeBarAction : Action {
     data class URLTapped(val url: String) : AwesomeBarAction()
@@ -32,25 +33,28 @@ sealed class AwesomeBarChange : Change {
 
 class AwesomeBarComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
-    override var initialState: AwesomeBarState = AwesomeBarState("", false)
+    override var initialState: AwesomeBarState = AwesomeBarState()
 ) : UIComponent<AwesomeBarState, AwesomeBarAction, AwesomeBarChange>(
+    fragment,
     bus.getManagedEmitter(AwesomeBarAction::class.java),
     bus.getSafeManagedObservable(AwesomeBarChange::class.java)
 ) {
-    override val reducer: Reducer<AwesomeBarState, AwesomeBarChange> = { state, change ->
+    override val reducer: Reducer<VM<AwesomeBarState>, AwesomeBarChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
             is AwesomeBarChange.SearchShortcutEngineSelected ->
-                state.copy(suggestionEngine = change.engine, showShortcutEnginePicker = false)
+                vm.copyIn(state.copy(suggestionEngine = change.engine, showShortcutEnginePicker = false))
             is AwesomeBarChange.SearchShortcutEnginePicker ->
-                state.copy(showShortcutEnginePicker = change.show)
-            is AwesomeBarChange.UpdateQuery -> state.copy(query = change.query)
+                vm.copyIn(state.copy(showShortcutEnginePicker = change.show))
+            is AwesomeBarChange.UpdateQuery -> vm.copyIn(state.copy(query = change.query))
         }
     }
 
     override fun initView() = AwesomeBarUIView(container, actionEmitter, changesObservable)
 
     init {
-        render(reducer)
+        render(reducer, VM<AwesomeBarState>()::class)
     }
 }

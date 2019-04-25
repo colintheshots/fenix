@@ -4,6 +4,7 @@
 
 package org.mozilla.fenix.mvi
 
+import androidx.lifecycle.ViewModel
 import io.reactivex.ObservableTransformer
 import io.reactivex.subjects.Subject
 import mozilla.components.support.base.log.logger.Logger
@@ -22,7 +23,7 @@ interface Change : Action
 /**
  * A ViewState is a model reflecting the current state of the view
  */
-interface ViewState
+open class ViewState : ViewModel()
 
 /**
  * A Reducer applies changes to the ViewState

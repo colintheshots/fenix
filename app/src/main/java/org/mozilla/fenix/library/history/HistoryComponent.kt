@@ -4,60 +4,68 @@
 package org.mozilla.fenix.library.history
 
 import android.view.ViewGroup
-import org.mozilla.fenix.test.Mockable
+import androidx.fragment.app.Fragment
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
 import org.mozilla.fenix.mvi.Change
+import org.mozilla.fenix.mvi.Reducer
 import org.mozilla.fenix.mvi.UIComponent
 import org.mozilla.fenix.mvi.ViewState
+import org.mozilla.fenix.test.Mockable
 
 data class HistoryItem(val id: Int, val title: String, val url: String, val visitedAt: Long)
 
 @Mockable
 class HistoryComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
-    override var initialState: HistoryState = HistoryState(emptyList(), HistoryState.Mode.Normal)
+    override var initialState: HistoryState = HistoryState()
 ) :
     UIComponent<HistoryState, HistoryAction, HistoryChange>(
+        fragment,
         bus.getManagedEmitter(HistoryAction::class.java),
         bus.getSafeManagedObservable(HistoryChange::class.java)
     ) {
 
-    override val reducer: (HistoryState, HistoryChange) -> HistoryState = { state, change ->
+    override val reducer: Reducer<VM<HistoryState>, HistoryChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
-            is HistoryChange.Change -> state.copy(mode = HistoryState.Mode.Normal, items = change.list)
-            is HistoryChange.EnterEditMode -> state.copy(mode = HistoryState.Mode.Editing(listOf(change.item)))
+            is HistoryChange.Change -> vm.copyIn(state.copy(mode = HistoryState.Mode.Normal, items = change.list))
+            is HistoryChange.EnterEditMode -> vm.copyIn(state.copy(mode = HistoryState.Mode.Editing(listOf(change.item))))
             is HistoryChange.AddItemForRemoval -> {
                 val mode = state.mode
                 if (mode is HistoryState.Mode.Editing) {
                     val items = mode.selectedItems + listOf(change.item)
-                    state.copy(mode = mode.copy(selectedItems = items))
+                    vm.copyIn(state.copy(mode = mode.copy(selectedItems = items)))
                 } else {
-                    state
+                    vm.copyIn(state)
                 }
             }
             is HistoryChange.RemoveItemForRemoval -> {
                 val mode = state.mode
                 if (mode is HistoryState.Mode.Editing) {
                     val items = mode.selectedItems.filter { it.id != change.item.id }
-                    state.copy(mode = mode.copy(selectedItems = items))
+                    vm.copyIn(state.copy(mode = mode.copy(selectedItems = items)))
                 } else {
-                    state
+                    vm.copyIn(state)
                 }
             }
-            is HistoryChange.ExitEditMode -> state.copy(mode = HistoryState.Mode.Normal)
+            is HistoryChange.ExitEditMode -> vm.copyIn(state.copy(mode = HistoryState.Mode.Normal))
         }
     }
 
     override fun initView() = HistoryUIView(container, actionEmitter, changesObservable)
 
     init {
-        render(reducer)
+        render(reducer, VM<HistoryState>()::class)
     }
 }
 
-data class HistoryState(val items: List<HistoryItem>, val mode: Mode) : ViewState {
+data class HistoryState(
+    val items: List<HistoryItem> = emptyList(),
+    val mode: Mode = Mode.Normal
+) : ViewState() {
     sealed class Mode {
         object Normal : Mode()
         data class Editing(val selectedItems: List<HistoryItem>) : Mode()

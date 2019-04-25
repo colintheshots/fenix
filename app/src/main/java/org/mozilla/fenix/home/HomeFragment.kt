@@ -75,6 +75,7 @@ class HomeFragment : Fragment(), CoroutineScope {
         val mode = if ((activity as HomeActivity).browsingModeManager.isPrivate) Mode.Private else Mode.Normal
         sessionControlComponent = SessionControlComponent(
             view.homeLayout,
+            this,
             bus,
             SessionControlState(listOf(), mode)
         )

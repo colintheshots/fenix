@@ -5,6 +5,7 @@
 package org.mozilla.fenix.library.bookmarks
 
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import mozilla.components.concept.storage.BookmarkNode
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
@@ -18,16 +19,18 @@ import org.mozilla.fenix.test.Mockable
 @Mockable
 class BookmarkComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
-    override var initialState: BookmarkState =
-        BookmarkState(null, BookmarkState.Mode.Normal)
+    override var initialState: BookmarkState = BookmarkState()
 ) :
     UIComponent<BookmarkState, BookmarkAction, BookmarkChange>(
+        fragment,
         bus.getManagedEmitter(BookmarkAction::class.java),
         bus.getSafeManagedObservable(BookmarkChange::class.java)
     ) {
 
-    override val reducer: Reducer<BookmarkState, BookmarkChange> = { state, change ->
+    override val reducer: Reducer<VM<BookmarkState>, BookmarkChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
             is BookmarkChange.Change -> {
                 val mode =
@@ -36,13 +39,13 @@ class BookmarkComponent(
                             it in change.tree
                         }.toSet())
                     } else state.mode
-                state.copy(tree = change.tree, mode = mode)
+                vm.copyIn(state.copy(tree = change.tree, mode = mode))
             }
             is BookmarkChange.IsSelected -> {
                 val selectedItems = if (state.mode is BookmarkState.Mode.Selecting) {
                     state.mode.selectedItems + change.newlySelectedItem
                 } else setOf(change.newlySelectedItem)
-                state.copy(mode = BookmarkState.Mode.Selecting(selectedItems))
+                vm.copyIn(state.copy(mode = BookmarkState.Mode.Selecting(selectedItems)))
             }
             is BookmarkChange.IsDeselected -> {
                 val selectedItems = if (state.mode is BookmarkState.Mode.Selecting) {
@@ -51,9 +54,11 @@ class BookmarkComponent(
                 val mode = if (selectedItems.isEmpty()) BookmarkState.Mode.Normal else BookmarkState.Mode.Selecting(
                     selectedItems
                 )
-                state.copy(mode = mode)
+                vm.copyIn(state.copy(mode = mode))
             }
-            is BookmarkChange.ClearSelection -> state.copy(mode = BookmarkState.Mode.Normal)
+            is BookmarkChange.ClearSelection -> {
+                vm.copyIn(state.copy(mode = BookmarkState.Mode.Normal))
+            }
         }
     }
 
@@ -61,11 +66,14 @@ class BookmarkComponent(
         BookmarkUIView(container, actionEmitter, changesObservable)
 
     init {
-        render(reducer)
+        render(reducer, VM<BookmarkState>()::class)
     }
 }
 
-data class BookmarkState(val tree: BookmarkNode?, val mode: Mode) : ViewState {
+data class BookmarkState(
+    val tree: BookmarkNode? = null,
+    val mode: Mode = Mode.Normal
+) : ViewState() {
     sealed class Mode {
         object Normal : Mode()
         data class Selecting(val selectedItems: Set<BookmarkNode>) : Mode()

@@ -115,10 +115,11 @@ class BrowserFragment : Fragment(), BackHandler, CoroutineScope {
 
         toolbarComponent = ToolbarComponent(
             view.browserLayout,
+            this,
             ActionBusFactory.get(this), sessionId,
             (activity as HomeActivity).browsingModeManager.isPrivate,
-            SearchState("", getSessionByIdOrUseSelectedSession().searchTerms, isEditing = false),
-            search_engine_icon
+            search_engine_icon,
+            SearchState("", getSessionByIdOrUseSelectedSession().searchTerms, isEditing = false)
         )
 
         toolbarComponent.uiView.view.apply {
@@ -137,7 +138,7 @@ class BrowserFragment : Fragment(), BackHandler, CoroutineScope {
             }
         }
 
-        QuickActionComponent(view.nestedScrollQuickAction, ActionBusFactory.get(this))
+        QuickActionComponent(view.nestedScrollQuickAction, this, ActionBusFactory.get(this))
 
         val activity = activity as HomeActivity
         DefaultThemeManager.applyStatusBarTheme(activity.window, activity.themeManager, activity)

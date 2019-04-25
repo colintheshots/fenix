@@ -6,12 +6,14 @@ package org.mozilla.fenix.settings.quicksettings
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import mozilla.components.feature.sitepermissions.SitePermissions
 import mozilla.components.support.ktx.kotlin.toUri
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
 import org.mozilla.fenix.mvi.Change
+import org.mozilla.fenix.mvi.Reducer
 import org.mozilla.fenix.mvi.UIComponent
 import org.mozilla.fenix.mvi.UIView
 import org.mozilla.fenix.mvi.ViewState
@@ -22,37 +24,48 @@ import org.mozilla.fenix.utils.Settings
 
 class QuickSettingsComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
     override var initialState: QuickSettingsState
 ) : UIComponent<QuickSettingsState, QuickSettingsAction, QuickSettingsChange>(
+    fragment,
     bus.getManagedEmitter(QuickSettingsAction::class.java),
     bus.getSafeManagedObservable(QuickSettingsChange::class.java)
 ) {
-    override val reducer: (QuickSettingsState, QuickSettingsChange) -> QuickSettingsState = { state, change ->
+    override val reducer: Reducer<VM<QuickSettingsState>, QuickSettingsChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
             is QuickSettingsChange.Change -> {
-                state.copy(
-                    mode = QuickSettingsState.Mode.Normal(
-                        change.url,
-                        change.isSecured,
-                        change.isTrackingProtectionOn,
-                        change.sitePermissions
+                vm.copyIn(
+                    state.copy(
+                        mode = QuickSettingsState.Mode.Normal(
+                            change.url,
+                            change.isSecured,
+                            change.isTrackingProtectionOn,
+                            change.sitePermissions
+                        )
                     )
                 )
             }
             is QuickSettingsChange.PermissionGranted -> {
-                state.copy(
-                    mode = QuickSettingsState.Mode.ActionLabelUpdated(change.phoneFeature, change.sitePermissions)
+                vm.copyIn(
+                    state.copy(
+                        mode = QuickSettingsState.Mode.ActionLabelUpdated(change.phoneFeature, change.sitePermissions)
+                    )
                 )
             }
             is QuickSettingsChange.PromptRestarted -> {
-                state.copy(
-                    mode = QuickSettingsState.Mode.CheckPendingFeatureBlockedByAndroid(change.sitePermissions)
+                vm.copyIn(
+                    state.copy(
+                        mode = QuickSettingsState.Mode.CheckPendingFeatureBlockedByAndroid(change.sitePermissions)
+                    )
                 )
             }
             is QuickSettingsChange.Stored -> {
-                state.copy(
-                    mode = QuickSettingsState.Mode.ActionLabelUpdated(change.phoneFeature, change.sitePermissions)
+                vm.copyIn(
+                    state.copy(
+                        mode = QuickSettingsState.Mode.ActionLabelUpdated(change.phoneFeature, change.sitePermissions)
+                    )
                 )
             }
         }
@@ -63,7 +76,7 @@ class QuickSettingsComponent(
     }
 
     init {
-        render(reducer)
+        render(reducer, VM<QuickSettingsState>()::class)
     }
 
     fun toggleSitePermission(
@@ -96,7 +109,7 @@ class QuickSettingsComponent(
     }
 }
 
-data class QuickSettingsState(val mode: Mode) : ViewState {
+data class QuickSettingsState(val mode: Mode) : ViewState() {
     sealed class Mode {
         data class Normal(
             val url: String,

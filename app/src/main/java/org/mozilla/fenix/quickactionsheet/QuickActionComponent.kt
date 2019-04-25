@@ -5,6 +5,7 @@
 package org.mozilla.fenix.quickactionsheet
 
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import org.mozilla.fenix.mvi.Action
 import org.mozilla.fenix.mvi.ActionBusFactory
 import org.mozilla.fenix.mvi.Change
@@ -15,17 +16,20 @@ import org.mozilla.fenix.mvi.ViewState
 
 class QuickActionComponent(
     private val container: ViewGroup,
+    fragment: Fragment,
     bus: ActionBusFactory,
-    override var initialState: QuickActionState = QuickActionState(false)
+    override var initialState: QuickActionState = QuickActionState()
 ) : UIComponent<QuickActionState, QuickActionAction, QuickActionChange>(
+    fragment,
     bus.getManagedEmitter(QuickActionAction::class.java),
     bus.getSafeManagedObservable(QuickActionChange::class.java)
 ) {
 
-    override val reducer: Reducer<QuickActionState, QuickActionChange> = { state, change ->
+    override val reducer: Reducer<VM<QuickActionState>, QuickActionChange> = { vm, change ->
+        val state = vm.state.value!!
         when (change) {
             is QuickActionChange.ReadableStateChange -> {
-                state.copy(readable = change.readable)
+                vm.copyIn(state.copy(readable = change.readable))
             }
         }
     }
@@ -34,11 +38,11 @@ class QuickActionComponent(
         QuickActionUIView(container, actionEmitter, changesObservable)
 
     init {
-        render(reducer)
+        render(reducer, VM<QuickActionState>()::class)
     }
 }
 
-data class QuickActionState(val readable: Boolean) : ViewState
+data class QuickActionState(val readable: Boolean = false) : ViewState()
 
 sealed class QuickActionAction : Action {
     object Opened : QuickActionAction()

@@ -31,6 +31,7 @@ class CreateCollectionFragment : DialogFragment() {
 
         collectionCreationComponent = CollectionCreationComponent(
             view.create_collection_wrapper,
+            this,
             ActionBusFactory.get(this)
         )
 

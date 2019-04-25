@@ -62,14 +62,15 @@ class SearchFragment : Fragment(), BackHandler {
 
         toolbarComponent = ToolbarComponent(
             view.toolbar_component_wrapper,
+            this,
             ActionBusFactory.get(this),
             sessionId,
             isPrivate,
-            SearchState(url, session?.searchTerms ?: "", isEditing = true),
-            view.search_engine_icon
+            view.search_engine_icon,
+            SearchState(url, session?.searchTerms ?: "", isEditing = true)
         )
 
-        awesomeBarComponent = AwesomeBarComponent(view.search_layout, ActionBusFactory.get(this))
+        awesomeBarComponent = AwesomeBarComponent(view.search_layout, this, ActionBusFactory.get(this))
         ActionBusFactory.get(this).logMergedObservables()
         return view
     }
