@@ -17,4 +17,4 @@
 ./gradlew -q \
         ktlint \
         detekt \
-        app:assembleDebug
+        app:assembleGeckoBetaDebug
