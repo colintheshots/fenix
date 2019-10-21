@@ -26,6 +26,7 @@ import mozilla.components.browser.search.SearchEngine
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.concept.engine.EngineView
+import mozilla.components.feature.secureproxy.SecureProxyFeature
 import mozilla.components.service.fxa.sync.SyncReason
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.kotlin.isUrl
@@ -124,6 +125,12 @@ open class HomeActivity : AppCompatActivity() {
                     accountManager.syncNowAsync(SyncReason.Startup, debounce = true)
                     it.deviceConstellation().pollForEventsAsync().await()
                 }
+
+                SecureProxyFeature(
+                    components.core.client,
+                    accountManager,
+                    components.core.sessionManager
+                )
             }
         }
     }

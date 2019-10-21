@@ -418,6 +418,7 @@ dependencies {
     implementation Deps.mozilla_feature_pwa
     implementation Deps.mozilla_feature_qr
     implementation Deps.mozilla_feature_search
+    implementation Deps.mozilla_feature_secure_proxy
     implementation Deps.mozilla_feature_session
     implementation Deps.mozilla_feature_toolbar
     implementation Deps.mozilla_feature_tabs
