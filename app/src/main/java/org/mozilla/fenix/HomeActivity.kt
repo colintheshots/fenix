@@ -130,7 +130,7 @@ open class HomeActivity : AppCompatActivity() {
                     components.core.client,
                     accountManager,
                     components.core.sessionManager
-                )
+                ).onResume()
             }
         }
     }
