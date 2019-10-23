@@ -153,7 +153,8 @@ class ToolbarView(
             searchState.searchEngineSource.searchEngine.icon,
             iconSize,
             iconSize,
-            true)
+            true
+        )
 
         val icon = BitmapDrawable(container.resources, scaledIcon)
 
