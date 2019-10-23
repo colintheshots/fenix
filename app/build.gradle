@@ -209,6 +209,10 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
+    aaptOptions {
+        ignoreAssetsPattern '!._'
+    }
 }
 
 def baseVersionCode = generatedVersionCode
