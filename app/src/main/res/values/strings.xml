@@ -13,6 +13,10 @@
     <string name="content_description_private_browsing_button">Enable private browsing</string>
     <!-- Content description (not visible, for screen readers etc.): "Private Browsing" menu button. -->
     <string name="content_description_disable_private_browsing_button">Disable private browsing</string>
+    <!-- Content description (not visible, for screen readers etc.): "Secure Proxy" menu button. -->
+    <string name="content_description_secure_proxy_button">Enable secure proxy</string>
+    <!-- Content description (not visible, for screen readers etc.): "Secure Proxy" menu button. -->
+    <string name="content_description_disable_secure_proxy_button">Disable secure proxy</string>
     <!-- Placeholder text shown in the search bar before a user enters text -->
     <string name="search_hint">Search or enter address</string>
     <!-- No Open Tabs Message Header -->

@@ -397,4 +397,9 @@ class Settings private constructor(
 
             return false
         }
+    
+    var secureProxyEnabled by booleanPreference(
+        appContext.getPreferenceKey(R.string.pref_key_secure_proxy_enabled),
+        default = false
+    )
 }

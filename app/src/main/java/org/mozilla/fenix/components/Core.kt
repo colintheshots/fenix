@@ -46,6 +46,7 @@ import org.mozilla.fenix.HomeActivity
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.test.Mockable
+import org.mozilla.geckoview.GeckoRuntime
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -54,6 +55,11 @@ import java.util.concurrent.TimeUnit
  */
 @Mockable
 class Core(private val context: Context) {
+
+    val runtime: GeckoRuntime by lazy {
+        GeckoProvider.getOrCreateRuntime(context)
+    }
+
     /**
      * The browser engine component initialized based on the build
      * configuration (see build variants).
@@ -73,7 +79,7 @@ class Core(private val context: Context) {
             forceUserScalableContent = context.settings().forceEnableZoom
         )
 
-        GeckoEngine(context, defaultSettings, GeckoProvider.getOrCreateRuntime(context)).also {
+        GeckoEngine(context, defaultSettings, runtime).also {
             WebCompatFeature.install(it)
         }
     }
@@ -82,7 +88,7 @@ class Core(private val context: Context) {
      * [Client] implementation to be used for code depending on `concept-fetch``
      */
     val client: Client by lazy {
-        GeckoViewFetchClient(context, GeckoProvider.getOrCreateRuntime(context))
+        GeckoViewFetchClient(context, runtime)
     }
 
     val sessionStorage: SessionStorage by lazy {
