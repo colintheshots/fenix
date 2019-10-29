@@ -304,7 +304,7 @@ class HomeFragment : Fragment() {
             nav(R.id.homeFragment, directions)
         }
 
-        SecureProxyButtonView(secureProxyButton) { enabled ->
+        SecureProxyButtonView(secureProxyButton) {
             // if (enabled) {
             //
             // } else {
