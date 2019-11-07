@@ -7,6 +7,7 @@ package org.mozilla.fenix.home
 import android.view.View
 import androidx.annotation.StringRes
 import org.mozilla.fenix.R
+import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
 
 /**
@@ -14,23 +15,15 @@ import org.mozilla.fenix.ext.settings
  */
 class SecureProxyButtonView(
     button: View,
-    private val onClick: (Boolean) -> Unit
-) : View.OnClickListener {
+    onClick: () -> Unit
+) {
 
     init {
         button.contentDescription =
-            button.context.getString(getContentDescription(button.context.settings().secureProxyEnabled))
-        button.setOnClickListener(this)
-    }
-
-    /**
-     * Calls [onClick] with the new value of proxy enabled/disabled
-     */
-    override fun onClick(v: View) {
-        val invertedMode = !v.context.settings().secureProxyEnabled
-        onClick(invertedMode)
-
-        v.context.settings().secureProxyEnabled = invertedMode
+            button.context.getString(getContentDescription(button.context.components.services.secureProxy.config.enabled))
+        button.setOnClickListener {
+            onClick.invoke()
+        }
     }
 
     companion object {

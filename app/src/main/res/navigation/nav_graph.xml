@@ -88,6 +88,9 @@
         <action
             android:id="@+id/action_homeFragment_to_shareFragment"
             app:destination="@id/shareFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_proxyFragment"
+            app:destination="@id/proxyFragment" />
     </fragment>
 
     <fragment
@@ -397,6 +400,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_toolbarSettingsFragment"
             app:destination="@id/toolbarSettingsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_proxyFragment"
+            app:destination="@id/proxyFragment" />
     </fragment>
     <fragment
         android:id="@+id/dataChoicesFragment"
@@ -682,4 +688,8 @@
         android:id="@+id/toolbarSettingsFragment"
         android:name="org.mozilla.fenix.settings.ToolbarSettingsFragment"
         android:label="ToolbarSettingsFragment" />
+    <fragment
+        android:id="@+id/proxyFragment"
+        android:name="org.mozilla.fenix.secureproxy.ProxyFragment"
+        android:label="ProxyFragment" />
 </navigation>

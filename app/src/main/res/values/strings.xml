@@ -956,6 +956,10 @@
     <!-- About page link text to open a screen with libraries that are used -->
     <string name="about_other_open_source_libraries">Libraries that we use</string>
 
+    <!-- Secure Proxy -->
+    <!-- Preference title for secure proxy settings switch -->
+    <string name="preference_secure_proxy">Firefox Network Protection</string>
+
     <!-- Content description of the tab counter toolbar button when one tab is open -->
     <string name="tab_counter_content_description_one_tab">1 tab</string>
     <!-- Content description of the tab counter toolbar button when multiple tabs are open. First parameter will be replaced with the number of tabs (always more than one) -->
@@ -1107,4 +1111,5 @@
     <string name="search_edit_custom_engine_success_message">Saved %s</string>
     <!-- Text shown when a user successfully deletes a custom search engine -->
     <string name="search_delete_search_engine_success_message">Deleted %s</string>
+    <string name="firefox_private_network_switch_title">Firefox Private Network</string>
 </resources>

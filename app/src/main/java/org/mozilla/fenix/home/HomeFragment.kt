@@ -54,7 +54,6 @@ import mozilla.components.concept.sync.OAuthAccount
 import mozilla.components.feature.media.ext.getSession
 import mozilla.components.feature.media.state.MediaState
 import mozilla.components.feature.media.state.MediaStateMachine
-import mozilla.components.feature.secureproxy.SecureProxyFeature
 import mozilla.components.feature.tab.collections.TabCollection
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.BOTTOM
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.END
@@ -305,11 +304,8 @@ class HomeFragment : Fragment() {
         }
 
         SecureProxyButtonView(secureProxyButton) {
-            // if (enabled) {
-            //
-            // } else {
-            //
-            // }
+            invokePendingDeleteJobs()
+            nav(R.id.homeFragment, HomeFragmentDirections.actionHomeFragmentToProxyFragment())
         }
 
         PrivateBrowsingButtonView(

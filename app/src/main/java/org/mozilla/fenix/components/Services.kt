@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mozilla.components.feature.accounts.FirefoxAccountsAuthFeature
+import mozilla.components.feature.secureproxy.SecureProxyFeature
 import mozilla.components.service.fxa.manager.FxaAccountManager
 import mozilla.components.support.ktx.android.content.hasCamera
 import org.mozilla.fenix.Experiments
@@ -40,6 +41,15 @@ class Services(
                 context.startActivity(intent)
             }
         }
+    }
+
+    val secureProxy by lazy {
+        SecureProxyFeature(
+            context,
+            context.components.core.client,
+            context.components.backgroundServices.accountManager,
+            context.components.core.sessionManager
+        )
     }
 
     /**

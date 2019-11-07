@@ -125,12 +125,7 @@ open class HomeActivity : AppCompatActivity() {
                     accountManager.syncNowAsync(SyncReason.Startup, debounce = true)
                     it.deviceConstellation().pollForEventsAsync().await()
                 }
-
-                SecureProxyFeature(
-                    components.core.client,
-                    accountManager,
-                    components.core.sessionManager
-                ).onResume()
+                components.services.secureProxy.onResume()
             }
         }
     }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import mozilla.appservices.Megazord
 import mozilla.components.concept.push.PushProcessor
+import mozilla.components.feature.secureproxy.SecureProxyFeature
 import mozilla.components.service.experiments.Experiments
 import mozilla.components.service.fretboard.Fretboard
 import mozilla.components.service.fretboard.source.kinto.KintoExperimentSource
@@ -34,6 +35,7 @@ import mozilla.components.support.rusthttp.RustHttpConfig
 import mozilla.components.support.rustlog.RustLog
 import org.mozilla.fenix.GleanMetrics.ExperimentsMetrics
 import org.mozilla.fenix.components.Components
+import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.session.NotificationSessionObserver
 import org.mozilla.fenix.session.VisibilityLifecycleCallback
@@ -125,6 +127,7 @@ open class FenixApplication : Application() {
         }
 
         setupPush()
+        startSecureProxy()
 
         visibilityLifecycleCallback = VisibilityLifecycleCallback(getSystemService())
         registerActivityLifecycleCallbacks(visibilityLifecycleCallback)
@@ -177,6 +180,10 @@ open class FenixApplication : Application() {
             fretboard.updateExperiments()
             return@async true
         }
+    }
+
+    private fun startSecureProxy() {
+        components.services.secureProxy.onApplicationStartup()
     }
 
     private fun setupPush() {

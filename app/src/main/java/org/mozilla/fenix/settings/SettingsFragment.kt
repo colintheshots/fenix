@@ -272,6 +272,9 @@ class SettingsFragment : PreferenceFragmentCompat(), AccountObserver {
                     startActivity(intent)
                 }
             }
+            resources.getString(pref_key_secure_proxy_enabled) -> {
+                nav(R.id.settingsFragment, SettingsFragmentDirections.actionSettingsFragmentToProxyFragment())
+            }
         }
         return super.onPreferenceTreeClick(preference)
     }

@@ -35,8 +35,8 @@
             android:layout_height="@dimen/glyph_button_height"
             android:layout_marginEnd="60dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/content_description_private_browsing_button"
-            android:src="@drawable/ic_login"
+            android:contentDescription="@string/content_description_secure_proxy_button"
+            android:src="@drawable/fpn_button"
             app:layout_constraintBottom_toTopOf="@+id/wordmark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
