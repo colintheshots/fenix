@@ -4,17 +4,16 @@
 
 package org.mozilla.fenix.home
 
-import android.view.View
+import android.widget.ImageButton
 import androidx.annotation.StringRes
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.components
-import org.mozilla.fenix.ext.settings
 
 /**
  * Sets up the secure proxy toggle button on the [HomeFragment].
  */
 class SecureProxyButtonView(
-    button: View,
+    button: ImageButton,
     onClick: () -> Unit
 ) {
 
@@ -24,6 +23,7 @@ class SecureProxyButtonView(
         button.setOnClickListener {
             onClick.invoke()
         }
+        button.isActivated = button.context.components.services.secureProxy.config.enabled // TODO Make this observe the proxy state
     }
 
     companion object {
