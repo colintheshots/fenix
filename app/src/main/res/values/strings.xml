@@ -959,6 +959,10 @@
     <!-- Secure Proxy -->
     <!-- Preference title for secure proxy settings switch -->
     <string name="preference_secure_proxy">Firefox Network Protection</string>
+    <!-- Summary of secure proxy preference if secure proxy is set to on -->
+    <string name="secure_proxy_on">On</string>
+    <!-- Summary of secure proxy preference if secure proxy is set to off -->
+    <string name="secure_proxy_off">Off</string>
 
     <!-- Content description of the tab counter toolbar button when one tab is open -->
     <string name="tab_counter_content_description_one_tab">1 tab</string>

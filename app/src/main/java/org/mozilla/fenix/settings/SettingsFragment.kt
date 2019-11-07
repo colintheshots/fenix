@@ -120,6 +120,15 @@ class SettingsFragment : PreferenceFragmentCompat(), AccountObserver {
     }
 
     private fun update() {
+        val fpnPreference = findPreference<Preference>(getPreferenceKey(
+            pref_key_secure_proxy_enabled))
+        fpnPreference?.summary = context?.let {
+            if (it.components.services.secureProxy.config.enabled) {
+                getString(secure_proxy_on)
+            } else {
+                getString(secure_proxy_off)
+            }
+        }
         val trackingProtectionPreference =
             findPreference<Preference>(getPreferenceKey(pref_key_tracking_protection_settings))
         trackingProtectionPreference?.summary = context?.let {
