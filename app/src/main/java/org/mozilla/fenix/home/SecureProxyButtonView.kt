@@ -4,6 +4,7 @@
 
 package org.mozilla.fenix.home
 
+import android.view.View.VISIBLE
 import android.widget.ImageButton
 import androidx.annotation.StringRes
 import org.mozilla.fenix.R
@@ -12,12 +13,10 @@ import org.mozilla.fenix.ext.components
 /**
  * Sets up the secure proxy toggle button on the [HomeFragment].
  */
-class SecureProxyButtonView(
-    button: ImageButton,
-    onClick: () -> Unit
-) {
+object SecureProxyButtonView {
 
-    init {
+    fun setup(button: ImageButton, onClick: () -> Unit) {
+        button.visibility = VISIBLE
         button.contentDescription =
             button.context.getString(getContentDescription(button.context.components.services.secureProxy.config.enabled))
         button.setOnClickListener {
@@ -26,15 +25,12 @@ class SecureProxyButtonView(
         button.isActivated = button.context.components.services.secureProxy.config.enabled // TODO Make this observe the proxy state
     }
 
-    companion object {
-
-        /**
-         * Returns the appropriate content description depending on the secure proxy mode.
-         */
-        @StringRes
-        private fun getContentDescription(mode: Boolean) = when (mode) {
-            true -> R.string.content_description_secure_proxy_button
-            false -> R.string.content_description_disable_secure_proxy_button
-        }
+    /**
+     * Returns the appropriate content description depending on the secure proxy mode.
+     */
+    @StringRes
+    private fun getContentDescription(mode: Boolean) = when (mode) {
+        true -> R.string.content_description_secure_proxy_button
+        false -> R.string.content_description_disable_secure_proxy_button
     }
 }

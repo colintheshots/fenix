@@ -303,14 +303,6 @@ class HomeFragment : Fragment() {
             nav(R.id.homeFragment, directions)
         }
 
-        if (FeatureFlags.secureProxy && requireComponents.backgroundServices.hasInternalEmail()) {
-            secureProxyButton.visibility = View.VISIBLE
-            SecureProxyButtonView(secureProxyButton) {
-                invokePendingDeleteJobs()
-                nav(R.id.homeFragment, HomeFragmentDirections.actionHomeFragmentToProxyFragment())
-            }
-        }
-
         PrivateBrowsingButtonView(
             privateBrowsingButton,
             browsingModeManager
@@ -353,6 +345,7 @@ class HomeFragment : Fragment() {
         requireComponents.backgroundServices.accountManager.register(object : AccountObserver {
             override fun onAuthenticated(account: OAuthAccount, authType: AuthType) {
                 if (authType != AuthType.Existing) {
+                    showProxyButton()
                     view?.let {
                         FenixSnackbar.make(it, Snackbar.LENGTH_SHORT)
                             .setText(it.context.getString(R.string.onboarding_firefox_account_sync_is_on))
@@ -368,6 +361,13 @@ class HomeFragment : Fragment() {
             !PrivateShortcutCreateManager.doesPrivateBrowsingPinnedShortcutExist(context)) {
             recommendPrivateBrowsingShortcut()
         }
+
+        showProxyButton()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        subscribeToTabCollections()
 
         // We only want this observer live just before we navigate away to the collection creation screen
         requireComponents.core.tabCollectionStorage.unregister(collectionStorageObserver)
@@ -807,6 +807,15 @@ class HomeFragment : Fragment() {
     override fun onPause() {
         this.activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         super.onPause()
+    }
+
+    private fun showProxyButton() {
+        if (FeatureFlags.secureProxy && requireComponents.backgroundServices.hasInternalEmail()) {
+            SecureProxyButtonView.setup(secureProxyButton) {
+                invokePendingDeleteJobs()
+                nav(R.id.homeFragment, HomeFragmentDirections.actionHomeFragmentToProxyFragment())
+            }
+        }
     }
 
     companion object {
