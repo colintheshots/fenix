@@ -4,9 +4,18 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/signInView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+    </com.google.android.material.card.MaterialCardView>
+
     <Switch
         android:id="@+id/secureProxySwitch"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signInView"
         android:text="@string/firefox_private_network_switch_title"
         android:drawableStart="@drawable/ic_fpn_disabled"
         android:drawablePadding="10dp"

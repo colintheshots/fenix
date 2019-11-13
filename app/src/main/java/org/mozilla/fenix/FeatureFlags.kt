@@ -35,6 +35,11 @@ object FeatureFlags {
     val progressiveWebApps = Config.channel.isNightlyOrDebug
 
     /**
+     * Gives the option to connect to web pages through a Secure Proxy
+     */
+    val secureProxy = Config.channel.isNightlyOrDebug
+
+    /**
      * Gives option in Settings to see logins and sync logins
      */
     val logins = Config.channel.isNightlyOrDebug

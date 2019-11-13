@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mozilla.components.feature.accounts.FirefoxAccountsAuthFeature
 import mozilla.components.feature.secureproxy.SecureProxyFeature
 import mozilla.components.service.fxa.manager.FxaAccountManager
+import mozilla.components.service.location.MozillaLocationService
 import mozilla.components.support.ktx.android.content.hasCamera
 import org.mozilla.fenix.Experiments
 import org.mozilla.fenix.NavGraphDirections
@@ -48,8 +49,13 @@ class Services(
             context,
             context.components.core.client,
             context.components.backgroundServices.accountManager,
-            context.components.core.sessionManager
+            context.components.core.sessionManager,
+            mozillaLocationService
         )
+    }
+
+    val mozillaLocationService by lazy {
+        MozillaLocationService(context,context.components.core.client, "FAKE_API_KEY")
     }
 
     /**

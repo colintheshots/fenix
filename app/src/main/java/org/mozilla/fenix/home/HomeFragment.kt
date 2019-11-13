@@ -303,9 +303,12 @@ class HomeFragment : Fragment() {
             nav(R.id.homeFragment, directions)
         }
 
-        SecureProxyButtonView(secureProxyButton) {
-            invokePendingDeleteJobs()
-            nav(R.id.homeFragment, HomeFragmentDirections.actionHomeFragmentToProxyFragment())
+        if (FeatureFlags.secureProxy && requireComponents.backgroundServices.hasInternalEmail()) {
+            secureProxyButton.visibility = View.VISIBLE
+            SecureProxyButtonView(secureProxyButton) {
+                invokePendingDeleteJobs()
+                nav(R.id.homeFragment, HomeFragmentDirections.actionHomeFragmentToProxyFragment())
+            }
         }
 
         PrivateBrowsingButtonView(

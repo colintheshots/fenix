@@ -26,7 +26,6 @@ import mozilla.components.browser.search.SearchEngine
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.concept.engine.EngineView
-import mozilla.components.feature.secureproxy.SecureProxyFeature
 import mozilla.components.service.fxa.sync.SyncReason
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.ktx.kotlin.isUrl
@@ -121,11 +120,14 @@ open class HomeActivity : AppCompatActivity() {
                 // Make sure accountManager is initialized.
                 accountManager.initAsync().await()
                 // If we're authenticated, kick-off a sync and a device state refresh.
-                accountManager.authenticatedAccount()?.let {
+                accountManager.authenticatedAccount()?.let { account ->
                     accountManager.syncNowAsync(SyncReason.Startup, debounce = true)
-                    it.deviceConstellation().pollForEventsAsync().await()
+                    account.deviceConstellation().pollForEventsAsync().await()
+
+                    if (FeatureFlags.secureProxy && hasInternalEmail()) {
+                        components.services.secureProxy.onResume()
+                    }
                 }
-                components.services.secureProxy.onResume()
             }
         }
     }
