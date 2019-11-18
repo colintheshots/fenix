@@ -4,9 +4,11 @@
 
 package org.mozilla.fenix.home
 
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageButton
 import androidx.annotation.StringRes
+import org.mozilla.fenix.FeatureFlags
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.components
 
@@ -16,13 +18,14 @@ import org.mozilla.fenix.ext.components
 object SecureProxyButtonView {
 
     fun setup(button: ImageButton, onClick: () -> Unit) {
-        button.visibility = VISIBLE
+        val enabled = button.context.components.services.secureProxy.config.enabled
+        button.visibility = if (FeatureFlags.secureProxy) VISIBLE else GONE
         button.contentDescription =
-            button.context.getString(getContentDescription(button.context.components.services.secureProxy.config.enabled))
+            button.context.getString(getContentDescription(enabled))
         button.setOnClickListener {
             onClick.invoke()
         }
-        button.isActivated = button.context.components.services.secureProxy.config.enabled // TODO Make this observe the proxy state
+        button.isActivated = enabled // TODO Make this observe the proxy state
     }
 
     /**

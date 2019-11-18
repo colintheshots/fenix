@@ -810,11 +810,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun showProxyButton() {
-        if (FeatureFlags.secureProxy && requireComponents.backgroundServices.hasInternalEmail()) {
-            SecureProxyButtonView.setup(secureProxyButton) {
-                invokePendingDeleteJobs()
-                nav(R.id.homeFragment, HomeFragmentDirections.actionHomeFragmentToProxyFragment())
-            }
+        SecureProxyButtonView.setup(secureProxyButton) {
+            invokePendingDeleteJobs()
+            nav(R.id.homeFragment, HomeFragmentDirections.actionHomeFragmentToProxyFragment())
         }
     }
 

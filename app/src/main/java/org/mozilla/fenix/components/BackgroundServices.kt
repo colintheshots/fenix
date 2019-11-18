@@ -136,10 +136,6 @@ class BackgroundServices(
 
     val accountManager = makeAccountManager(context, serverConfig, deviceConfig, syncConfig)
 
-    fun hasInternalEmail() : Boolean {
-        return accountManager.accountProfile()?.email?.endsWith("@mozilla.com") == true
-    }
-
     @VisibleForTesting(otherwise = PRIVATE)
     fun makePush(pushConfig: PushConfig): AutoPushFeature {
         return AutoPushFeature(

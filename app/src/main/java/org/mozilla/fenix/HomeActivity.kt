@@ -124,7 +124,7 @@ open class HomeActivity : AppCompatActivity() {
                     accountManager.syncNowAsync(SyncReason.Startup, debounce = true)
                     account.deviceConstellation().pollForEventsAsync().await()
 
-                    if (FeatureFlags.secureProxy && hasInternalEmail()) {
+                    if (FeatureFlags.secureProxy && components.services.secureProxy.config.enabled) {
                         components.services.secureProxy.onResume()
                     }
                 }
