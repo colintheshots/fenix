@@ -46,6 +46,7 @@ import org.mozilla.fenix.R.string.pref_key_privacy_link
 import org.mozilla.fenix.R.string.pref_key_rate
 import org.mozilla.fenix.R.string.pref_key_remote_debugging
 import org.mozilla.fenix.R.string.pref_key_search_settings
+import org.mozilla.fenix.R.string.pref_key_secure_proxy_enabled
 import org.mozilla.fenix.R.string.pref_key_sign_in
 import org.mozilla.fenix.R.string.pref_key_site_permissions
 import org.mozilla.fenix.R.string.pref_key_theme
@@ -58,6 +59,7 @@ import org.mozilla.fenix.ext.application
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.getPreferenceKey
 import org.mozilla.fenix.ext.metrics
+import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.ext.showToolbar
@@ -125,9 +127,9 @@ class SettingsFragment : PreferenceFragmentCompat(), AccountObserver {
         if (FeatureFlags.secureProxy) {
             fpnPreference?.summary = context?.let {
                 if (it.components.services.secureProxy.config.enabled) {
-                    getString(secure_proxy_on)
+                    getString(R.string.secure_proxy_on)
                 } else {
-                    getString(secure_proxy_off)
+                    getString(R.string.secure_proxy_off)
                 }
             }
         } else {

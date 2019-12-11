@@ -363,11 +363,6 @@ class HomeFragment : Fragment() {
         }
 
         showProxyButton()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        subscribeToTabCollections()
 
         // We only want this observer live just before we navigate away to the collection creation screen
         requireComponents.core.tabCollectionStorage.unregister(collectionStorageObserver)
