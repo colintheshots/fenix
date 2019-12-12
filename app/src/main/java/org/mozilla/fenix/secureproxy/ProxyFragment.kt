@@ -5,17 +5,13 @@
 package org.mozilla.fenix.secureproxy
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_proxy.*
-import mozilla.components.support.base.feature.BackHandler
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.components
-import org.mozilla.fenix.utils.Settings
 
 class ProxyFragment : Fragment() {
 
