@@ -11,6 +11,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
@@ -56,6 +57,7 @@ import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.base.feature.UserInteractionHandler
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
 import mozilla.components.support.ktx.android.view.exitImmersiveModeIfNeeded
+import org.mozilla.fenix.EngineTouchTimeListener
 import org.mozilla.fenix.Experiments
 import org.mozilla.fenix.FeatureFlags
 import org.mozilla.fenix.HomeActivity
@@ -101,6 +103,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Session
     protected lateinit var browserInteractor: BrowserToolbarViewInteractor
     protected lateinit var browserToolbarView: BrowserToolbarView
 
+    protected var engineTouchTimeListener: EngineTouchTimeListener? = null
     protected val readerViewFeature = ViewBoundFeatureWrapper<ReaderViewFeature>()
 
     private val sessionFeature = ViewBoundFeatureWrapper<SessionFeature>()
@@ -147,12 +150,31 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Session
         browserInitialized = initializeUI(view) != null
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        engineTouchTimeListener = context as EngineTouchTimeListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        engineTouchTimeListener = null
+    }
+
     @Suppress("ComplexMethod", "LongMethod")
     @CallSuper
     protected open fun initializeUI(view: View): Session? {
         val context = requireContext()
         val sessionManager = context.components.core.sessionManager
         val store = context.components.core.store
+
+        engineView?.setOnTouchCallback { event ->
+            when (event?.action) {
+                MotionEvent.ACTION_UP -> {
+                    engineTouchTimeListener?.setLastEngineTouchTime(System.currentTimeMillis())
+                }
+            }
+            false
+        }
 
         return getSessionById()?.also { session ->
 

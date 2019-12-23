@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.CallSuper
 import androidx.annotation.IdRes
@@ -15,6 +17,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
@@ -55,21 +58,22 @@ import org.mozilla.fenix.library.history.HistoryFragmentDirections
 import org.mozilla.fenix.onboarding.FenixOnboarding
 import org.mozilla.fenix.perf.HotStartPerformanceMonitor
 import org.mozilla.fenix.search.SearchFragmentDirections
-import org.mozilla.fenix.settings.about.AboutFragmentDirections
 import org.mozilla.fenix.settings.DefaultBrowserSettingsFragmentDirections
 import org.mozilla.fenix.settings.SettingsFragmentDirections
 import org.mozilla.fenix.settings.TrackingProtectionFragmentDirections
+import org.mozilla.fenix.settings.about.AboutFragmentDirections
 import org.mozilla.fenix.theme.DefaultThemeManager
 import org.mozilla.fenix.theme.ThemeManager
 import java.lang.ref.WeakReference
 
 @SuppressWarnings("TooManyFunctions", "LargeClass")
-open class HomeActivity : AppCompatActivity() {
+open class HomeActivity : AppCompatActivity(), EngineTouchTimeListener {
 
     lateinit var themeManager: ThemeManager
     lateinit var browsingModeManager: BrowsingModeManager
 
     private var sessionObserver: SessionManager.Observer? = null
+    var lastEngineTouchTime: Long? = null
 
     private val hotStartMonitor = HotStartPerformanceMonitor()
 
@@ -353,7 +357,33 @@ open class HomeActivity : AppCompatActivity() {
         return DefaultThemeManager(browsingModeManager.mode, this)
     }
 
+    /**
+     * Overriding dispatchTouchEvent to handle tapjacking
+     *
+     * @param ev MotionEvent to consider
+     * @return Whether to consume the event without passing it
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        val withinInterval = System.currentTimeMillis() - (lastEngineTouchTime ?: 0L) < DIALOG_TOUCH_INTERVAL
+        val dialogVisible = {
+            supportFragmentManager.fragments.any {
+                it is DialogFragment && it.isVisible
+            }
+        }
+        if (withinInterval && dialogVisible()) {
+            // TODO Should this have telemetry? Will RoboTest in pre-release tests throw it off anyway?
+            return true
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    override fun setLastEngineTouchTime(lastTouchInMs: Long) {
+        lastEngineTouchTime = lastTouchInMs
+    }
+
     companion object {
+        const val DIALOG_TOUCH_INTERVAL = 500L
+
         const val OPEN_TO_BROWSER = "open_to_browser"
         const val OPEN_TO_BROWSER_AND_LOAD = "open_to_browser_and_load"
         const val OPEN_TO_SEARCH = "open_to_search"
@@ -362,4 +392,17 @@ open class HomeActivity : AppCompatActivity() {
         const val EXTRA_OPENED_FROM_NOTIFICATION = "notification_open"
         const val EXTRA_FINISH_ONBOARDING = "finishonboarding"
     }
+}
+
+/**
+ * Listener for activities which need to listen to the last engine touch time
+ */
+interface EngineTouchTimeListener {
+
+    /**
+     * Sets the time the engine was last touched (in ms)
+     *
+     * @param lastTouchInMs The value of System.currentTimeInMillis when the engine was last touched
+     */
+    fun setLastEngineTouchTime(lastTouchInMs: Long)
 }
