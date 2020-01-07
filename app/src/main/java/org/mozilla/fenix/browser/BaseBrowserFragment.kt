@@ -197,6 +197,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Session
             )
 
             browserToolbarView = BrowserToolbarView(
+                lifecycleOwner = this,
                 container = view.browserLayout,
                 shouldUseBottomToolbar = context.settings().shouldUseBottomToolbar,
                 interactor = browserInteractor,

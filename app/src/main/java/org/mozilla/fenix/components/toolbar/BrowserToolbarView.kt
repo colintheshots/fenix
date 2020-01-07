@@ -6,7 +6,6 @@ package org.mozilla.fenix.components.toolbar
 
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.PopupWindow
@@ -14,8 +13,9 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.browser_toolbar_popup_window.view.*
 import kotlinx.android.synthetic.main.component_browser_top_toolbar.view.*
 import mozilla.components.browser.domains.autocomplete.ShippedDomainsProvider
@@ -30,6 +30,7 @@ import org.mozilla.fenix.customtabs.CustomTabToolbarMenu
 import org.mozilla.fenix.ext.bookmarkStorage
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
+import org.mozilla.fenix.ext.viewDelegate
 import org.mozilla.fenix.search.toolbar.setScrollFlagsForTopToolbar
 import org.mozilla.fenix.theme.ThemeManager
 
@@ -42,14 +43,14 @@ interface BrowserToolbarViewInteractor {
 }
 
 class BrowserToolbarView(
+    private val lifecycleOwner: LifecycleOwner,
     private val container: ViewGroup,
     private val shouldUseBottomToolbar: Boolean,
     private val interactor: BrowserToolbarViewInteractor,
     private val customTabSession: Session?
-) : LayoutContainer {
+) : LifecycleOwner {
 
-    override val containerView: View?
-        get() = container
+    override fun getLifecycle(): Lifecycle = lifecycleOwner.lifecycle
 
     private val settings = container.context.settings()
 
@@ -59,11 +60,9 @@ class BrowserToolbarView(
         else -> R.layout.component_browser_top_toolbar
     }
 
-    private val layout = LayoutInflater.from(container.context)
-        .inflate(toolbarLayout, container, true)
+    private val layout by viewDelegate(LayoutInflater.from(container.context).inflate(toolbarLayout, container, true))
 
-    val view: BrowserToolbar = layout
-        .findViewById(R.id.toolbar)
+    val view: BrowserToolbar by viewDelegate(layout.findViewById(R.id.toolbar))
 
     val toolbarIntegration: ToolbarIntegration
 

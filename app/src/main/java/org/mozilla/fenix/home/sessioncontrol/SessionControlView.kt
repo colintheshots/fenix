@@ -6,17 +6,18 @@ package org.mozilla.fenix.home.sessioncontrol
 
 import android.os.Build
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mozilla.components.feature.tab.collections.TabCollection
 import mozilla.components.lib.state.ext.consumeFrom
 import org.mozilla.fenix.R
+import org.mozilla.fenix.ext.viewDelegate
 import org.mozilla.fenix.home.HomeFragmentState
 import org.mozilla.fenix.home.HomeFragmentStore
 import org.mozilla.fenix.home.Mode
@@ -127,16 +128,17 @@ private fun collectionTabItems(collection: TabCollection) = collection.tabs.mapI
 
 @ExperimentalCoroutinesApi
 class SessionControlView(
+    private val lifecycleOwner: LifecycleOwner,
     private val homeFragmentStore: HomeFragmentStore,
     private val container: ViewGroup,
     interactor: SessionControlInteractor
-) : LayoutContainer {
-    override val containerView: View?
-        get() = container
+) : LifecycleOwner {
 
-    val view: RecyclerView = LayoutInflater.from(container.context)
+    override fun getLifecycle(): Lifecycle = lifecycleOwner.lifecycle
+
+    val view: RecyclerView by viewDelegate(LayoutInflater.from(container.context)
         .inflate(R.layout.component_session_control, container, true)
-        .findViewById(R.id.home_component)
+        .findViewById(R.id.home_component))
 
     private val sessionControlAdapter = SessionControlAdapter(interactor)
 

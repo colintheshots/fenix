@@ -4,9 +4,12 @@
 
 package org.mozilla.fenix.ext
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Rect
 import android.view.TouchDelegate
 import android.view.View
+import androidx.lifecycle.LifecycleOwner
 import mozilla.components.support.ktx.android.util.dpToPx
 
 fun View.increaseTapArea(extraDps: Int) {
@@ -21,4 +24,16 @@ fun View.increaseTapArea(extraDps: Int) {
         touchRect.bottom += dips
         parent.touchDelegate = TouchDelegate(touchRect, this)
     }
+}
+
+@Suppress("unused")
+inline fun <reified T : View> View.viewDelegate(view: T?): ViewDelegate<T> = ViewDelegate(view, lifecycleOwner())
+inline fun <reified T : View> LifecycleOwner.viewDelegate(view: T?): ViewDelegate<T> = ViewDelegate(view, this)
+
+fun View.lifecycleOwner(): LifecycleOwner {
+    var context: Context = context
+    while (context !is LifecycleOwner) {
+        context = (context as ContextWrapper).baseContext
+    }
+    return context
 }

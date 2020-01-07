@@ -195,7 +195,7 @@ class HomeFragment : Fragment() {
             )
         )
 
-        sessionControlView = SessionControlView(homeFragmentStore, view.homeLayout, sessionControlInteractor)
+        sessionControlView = SessionControlView(this, homeFragmentStore, view.homeLayout, sessionControlInteractor)
 
         ConstraintSet().apply {
             clone(view.homeLayout)
